@@ -5,11 +5,26 @@ import sys
 def parsePdb(path):
     xyz = []
     try:
-        with open(path) as f:
-            for line in f:
-                l = line.split()
-                if l[0] == 'ATOM':
-                    xyz.append([np.float32(i) for i in l[6:9]])
+        # with open(path) as f:
+            # for line in f:
+                # l = line.split()
+                # if l[0] == 'ATOM':
+                    # xyz.append([np.float32(i) for i in l[6:9]])
+
+		#open the file
+		pdbFile = open(path, 'rt')
+		line = pdbFile.readline()
+		
+		while line:
+			l = line.split()
+			# skip non-CA atoms
+			if not ( (l[0] == 'ATOM') and l[2] == "CA" and (line[16] == " " or line[16] == "A" ) ):
+				line = pdbFile.readline();
+				continue;
+
+			xyz.append([np.float32(i) for i in l[6:9]])
+			line = pdbFile.readline()
+			
     except IOError:
         print("Could not open file '%s'" % self.path)
     return xyz
