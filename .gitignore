@@ -1,2 +1,5 @@
 # ignore .pdb files
 *.pdb
+
+# ignore results.txt
+results.txt
