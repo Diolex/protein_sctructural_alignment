@@ -1,9 +1,9 @@
 import numpy as np
-import sys, math, subprocess, csv
+import sys
 from atoms import Atoms
 from atoms import parsePdb
 from horns import horn
-
+import math
 
 def filter (atom_1, atom_2, ali):
 	seq_1 = ""
@@ -46,19 +46,24 @@ def filter (atom_1, atom_2, ali):
 	
 	return Atoms(xyz_1), Atoms(xyz_2)
 
-def getProteins():
-        proteins = []
-        p = subprocess.Popen('ls pdb/*.bc', shell=True,
-                                stdout=subprocess.PIPE,
-                                stderr=subprocess.PIPE)
-        for path in p.stdout:
-                xyz, name = parsePdb(path[:-1])
-                proteins.append(Atoms(xyz,name))
-
-        return proteins
+if __name__ == "__main__":
+	if len(sys.argv) < 3:
+		print("Enter 2 .pdb files to compare")
+		sys.exit()
 
 
-def wRMSD(atom_1, atom_2, ali):
+	# load alignment
+	try: 
+		ali = open(sys.argv[3], 'rt')
+	except IOError:
+		print("Could not open file '%s'" % sys.argv[3])
+		
+	# get the 2 proteins loaded
+	xyz, name = parsePdb(sys.argv[1])
+	atom_1 = Atoms(xyz, name)
+	xyz, name = parsePdb(sys.argv[2])	
+	atom_2 = Atoms(xyz, name)
+	
 	# filter non-aligned atoms
 	atom_1, atom_2 = filter (atom_1, atom_2, ali)
 	
@@ -117,36 +122,6 @@ def wRMSD(atom_1, atom_2, ali):
 			break # algorithm terminates
 		else:
 			sd = sdNew
+		#print (sd)
 	wrmsd = math.sqrt(sd / len(pro))
-        return wrmsd
-
-
-
-if __name__ == "__main__":
-	if len(sys.argv) < 1:
-		print("Enter the alignment file")
-                print("Assuming pdb files are located in pdb/")
-		sys.exit()
-
-
-	# load alignment
-	try: 
-		ali = open(sys.argv[1], 'rt')
-	except IOError:
-		print("Could not open file '%s'" % sys.argv[1])
-		
-        proteins = getProteins()
-	
-        with open('wRMSD.csv', 'w') as csvfile:
-                fieldnames = ['Protein A', 'Protein B', 'wRMSD']
-                writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
-                
-                writer.writeheader()
-                
-                for a in range(0,len(proteins) - 1):
-                        for b in range(1, len(proteins)):
-                                pA = proteins[a]
-                                pB = proteins[b]
-                                writer.writerow({'Protein A': pA.name,
-                                                 'Protein B': pB.name,
-                                                 'wRMSD': wRMSD(pA, pB, ali)})
+	print 'wRMSD is',wrmsd
