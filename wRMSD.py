@@ -147,7 +147,7 @@ if __name__ == "__main__":
                 fieldnames = ['Protein A', 'Protein B', 'wRMSD']
                 writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
                 
-                writer.writeheader()
+                #writer.writeheader()
                 print("Begin write")
                 print("# of proteins: %d" % len(proteins))
                 for a in range(0,len(proteins) - 1):
@@ -159,7 +159,7 @@ if __name__ == "__main__":
                                 #      (pA.name, pB.name, wRMSD(pA, pB, ali)))
                                 writer.writerow({'Protein A': pA.name, 'Protein B': pB.name, 
                                                  'wRMSD': wRMSD(pA, pB, ali)})
-                                print("%.2f%%" % (float(count/total)))
+                                print("%.2f%% | %d of %d" % (float(count/total), count, total))
                                 count += 1
 
                 print("Finish write")
