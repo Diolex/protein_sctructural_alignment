@@ -157,7 +157,7 @@ if __name__ == "__main__":
         proteins = getProteins()
 	total = sum(range(len(proteins)))
         count = 0
-        out = 'wRMSD-' + str(job*size) + '-' + str((job+1)*size) + '.csv'
+        out = 'output/wRMSD-' + str(job*size) + '-' + str((job+1)*size) + '.csv'
         print('job #: %d   size: %d' % (job,size))
         with open(out, 'w') as csvfile:
                 fieldnames = ['Protein A', 'Protein B', 'wRMSD']
