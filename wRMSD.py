@@ -133,33 +133,47 @@ if __name__ == "__main__":
 	if len(sys.argv) < 1:
 		print("Enter the alignment file")
                 print("Assuming pdb files are located in pdb/")
+                print("You can enter chunks of work with 2nd parameter as chunk #")
+                print("and 3rd parameter as chunk size")
+                print("   ex: python results.clustal 5 200")
 		sys.exit()
 
+        job = 0
+        size = 10000
+        if len(sys.argv) == 3:
+                job = int(sys.argv[2])
+                size = 100
+        elif len(sys.argv) == 4:
+                job = int(sys.argv[2])
+                size = int(sys.argv[3])
+                
         try: 
                 ali = open(sys.argv[1], 'rt')
         except IOError:
                 print("Could not open file '%s'" % sys.argv[1])
 
+
+
         proteins = getProteins()
 	total = sum(range(len(proteins)))
         count = 0
-        with open('wRMSD.csv', 'w') as csvfile:
+        out = 'wRMSD-' + str(job*size) + '-' + str((job+1)*size) + '.csv'
+        print('job #: %d   size: %d' % (job,size))
+        with open(out, 'w') as csvfile:
                 fieldnames = ['Protein A', 'Protein B', 'wRMSD']
                 writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
                 
-                #writer.writeheader()
                 print("Begin write")
                 print("# of proteins: %d" % len(proteins))
                 for a in range(0,len(proteins) - 1):
                         for b in range(a + 1, len(proteins)):
-                                pA = proteins[a]
-                                pB = proteins[b]
-                                #print('pA len: %d   pB len: %d' % (len(pA.xyz), len(pB.xyz)))
-                                #print('Protein A:%s, Protein B:%s, wRMSD: %f' % 
-                                #      (pA.name, pB.name, wRMSD(pA, pB, ali)))
-                                writer.writerow({'Protein A': pA.name, 'Protein B': pB.name, 
+                                if count >= job*size and count < (job+1)*size:
+                                        pA = proteins[a]
+                                        pB = proteins[b]
+                                        writer.writerow({'Protein A': pA.name, 'Protein B': pB.name, 
                                                  'wRMSD': wRMSD(pA, pB, ali)})
-                                print("%.2f%% | %d of %d" % (float(count/total), count, total))
+                                        #print("%.2f%% | %d of %d" % (float(count/total), count, total))
+                                        print("%.2f%% | %d of %d" % (float(100*(count % size)/size), count, total))
                                 count += 1
 
                 print("Finish write")
