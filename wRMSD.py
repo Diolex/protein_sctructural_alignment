@@ -14,13 +14,16 @@ def filter (atom_1, atom_2, ali):
 
 	# extract the proteins
 	for line in ali:
-		if (line.startswith(atom_1.name) and line[5] == 'A'):
+		#if (line.startswith(atom_1.name) and line[5] == 'A'):
+                if (line.startswith(atom_1.name)):
 			l = line.split()
 			seq_1 += l[1]
-		if (line.startswith(atom_2.name) and line[5] == 'A'):
+                #if (line.startswith(atom_2.name) and line[5] == 'A'):
+		if (line.startswith(atom_2.name)):
 			l = line.split()
 			seq_2 += l[1]			
-
+        ali.seek(0,0)
+        print('seq_1: %d  seq_2: %d' % (len(seq_1), len(seq_2)))
 	count_1 = 0
 	count_2 = 0
 	mask_1 = []
@@ -48,19 +51,23 @@ def filter (atom_1, atom_2, ali):
 
 def getProteins():
         proteins = []
-        p = subprocess.Popen('ls pdb/*.bc', shell=True,
+        print("Getting proteins")
+        p = subprocess.Popen('ls pdb/*.pdb', shell=True,
                                 stdout=subprocess.PIPE,
                                 stderr=subprocess.PIPE)
+        print("Getting structures")
         for path in p.stdout:
                 xyz, name = parsePdb(path[:-1])
+                print(name)
                 proteins.append(Atoms(xyz,name))
-
+        print("Finished with proteins")
         return proteins
 
 
 def wRMSD(atom_1, atom_2, ali):
 	# filter non-aligned atoms
 	atom_1, atom_2 = filter (atom_1, atom_2, ali)
+        print('wRMSD()| pA len: %d   pB len: %d' % (len(atom_1.xyz), len(atom_2.xyz)))
 	
 	pro = [atom_1, atom_2]
 	mmin = min(pro[0].count, pro[1].count)
@@ -128,13 +135,11 @@ if __name__ == "__main__":
                 print("Assuming pdb files are located in pdb/")
 		sys.exit()
 
+        try: 
+                ali = open(sys.argv[1], 'rt')
+        except IOError:
+                print("Could not open file '%s'" % sys.argv[1])
 
-	# load alignment
-	try: 
-		ali = open(sys.argv[1], 'rt')
-	except IOError:
-		print("Could not open file '%s'" % sys.argv[1])
-		
         proteins = getProteins()
 	
         with open('wRMSD.csv', 'w') as csvfile:
@@ -142,11 +147,16 @@ if __name__ == "__main__":
                 writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
                 
                 writer.writeheader()
-                
+                print("Begin write")
+                print("# of proteins: %d" % len(proteins))
                 for a in range(0,len(proteins) - 1):
-                        for b in range(1, len(proteins)):
+                        for b in range(a + 1, len(proteins)):
                                 pA = proteins[a]
                                 pB = proteins[b]
-                                writer.writerow({'Protein A': pA.name,
-                                                 'Protein B': pB.name,
+                                #print('pA len: %d   pB len: %d' % (len(pA.xyz), len(pB.xyz)))
+                                print('Protein A:%s, Protein B:%s, wRMSD: %f' % 
+                                      (pA.name, pB.name, wRMSD(pA, pB, ali)))
+                                writer.writerow({'Protein A': pA.name, 'Protein B': pB.name, 
                                                  'wRMSD': wRMSD(pA, pB, ali)})
+                                
+                print("Finish write")

@@ -18,13 +18,17 @@ def parsePdb(path):
 		line = pdbFile.readline()
 		l = line.split()
 		name = l[-1]
-		# print (name)
+                print ('atoms.parsePdb name: %s' % name)
 		line = pdbFile.readline()
 		
 		while line:
+                        if line[38] == '-':
+                                line = line[:38] + ' ' + line[38:]
+                        if line[46] == '-':
+                                line = line[:46] + ' ' + line[46:]
 			l = line.split()
-			# skip non-CA atoms
-			if not ( (l[0] == 'ATOM') and l[2] == "CA" and (line[16] == " " or line[16] == "A" ) ):
+			if not ( (l[0] == 'ATOM') and l[2] == "CA" and 
+                                 (line[16] == " " or line[16] == "A" ) ):
 				line = pdbFile.readline();
 				continue;
 
@@ -40,12 +44,6 @@ class Atoms:
 		self.name = name
 		self.xyz = np.matrix(xyz)
 		self.count = len(self.xyz)
-
-		# if len(self.xyz) > 1:
-		# 	print("x\t\ty\t\tz")
-		# 	print(self.xyz)
-		# 	print("Total atoms = %d" % self.count)
-		# 	print (name)
 		
 	def centroid(self):
 		return self.xyz.mean(0)

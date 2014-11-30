@@ -3,3 +3,16 @@
 
 # ignore results.txt
 results.txt
+*.py~
+
+*.pdb#
+
+*.py~
+
+*.pyc
+
+*.csv
+
+*.pim
+
+*.clustal
