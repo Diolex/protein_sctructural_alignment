@@ -5,7 +5,7 @@ with open('results.pim', 'r') as pim:
 	for line in pim:
 		l = line.split()
 		if len(l) > 15:
-			for n in range(3, len(l)):
+			for n in range(2, len(l)):
 				num = float(l[n])
 				for m in range(0,10):
 					if(num > m*10 and float(n) <= (m+1)*10):
