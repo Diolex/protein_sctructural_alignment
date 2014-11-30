@@ -23,7 +23,7 @@ def filter (atom_1, atom_2, ali):
 			l = line.split()
 			seq_2 += l[1]			
         ali.seek(0,0)
-        print('seq_1: %d  seq_2: %d' % (len(seq_1), len(seq_2)))
+        #print('seq_1: %d  seq_2: %d' % (len(seq_1), len(seq_2)))
 	count_1 = 0
 	count_2 = 0
 	mask_1 = []
@@ -67,7 +67,7 @@ def getProteins():
 def wRMSD(atom_1, atom_2, ali):
 	# filter non-aligned atoms
 	atom_1, atom_2 = filter (atom_1, atom_2, ali)
-        print('wRMSD()| pA len: %d   pB len: %d' % (len(atom_1.xyz), len(atom_2.xyz)))
+        #print('wRMSD()| pA len: %d   pB len: %d' % (len(atom_1.xyz), len(atom_2.xyz)))
 	
 	pro = [atom_1, atom_2]
 	mmin = min(pro[0].count, pro[1].count)
@@ -141,7 +141,8 @@ if __name__ == "__main__":
                 print("Could not open file '%s'" % sys.argv[1])
 
         proteins = getProteins()
-	
+	total = sum(range(len(proteins)))
+        count = 0
         with open('wRMSD.csv', 'w') as csvfile:
                 fieldnames = ['Protein A', 'Protein B', 'wRMSD']
                 writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
@@ -154,9 +155,11 @@ if __name__ == "__main__":
                                 pA = proteins[a]
                                 pB = proteins[b]
                                 #print('pA len: %d   pB len: %d' % (len(pA.xyz), len(pB.xyz)))
-                                print('Protein A:%s, Protein B:%s, wRMSD: %f' % 
-                                      (pA.name, pB.name, wRMSD(pA, pB, ali)))
+                                #print('Protein A:%s, Protein B:%s, wRMSD: %f' % 
+                                #      (pA.name, pB.name, wRMSD(pA, pB, ali)))
                                 writer.writerow({'Protein A': pA.name, 'Protein B': pB.name, 
                                                  'wRMSD': wRMSD(pA, pB, ali)})
-                                
+                                print("%.2f%%" % (float(count/total)))
+                                count += 1
+
                 print("Finish write")
