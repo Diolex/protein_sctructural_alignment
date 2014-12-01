@@ -33,8 +33,9 @@ def filter (atom_1, atom_2, ali):
 	for i in range(len(seq_1)):
 		if (seq_1[i] != '-'):
 			if (seq_2[i] != '-'):
-				mask_1.append(count_1)
-				mask_2.append(count_2)
+				if (seq_1[i] == seq_2[i]):
+					mask_1.append(count_1)
+					mask_2.append(count_2)
 				count_2 += 1
 			count_1 += 1
 		else:
