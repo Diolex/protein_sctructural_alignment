@@ -97,6 +97,7 @@ def wRMSD(atom_1, atom_2, ali):
 	# e is epsilon aka reaaaally small number
 	eps = 1.0*np.power(10.0,-5.0)
 	### STEP 3 ###
+
 	while True:
 		for p in pro:
 			# Ri = from Horn's method
@@ -125,7 +126,7 @@ def wRMSD(atom_1, atom_2, ali):
 			break # algorithm terminates
 		else:
 			sd = sdNew
-	wrmsd = math.sqrt(sd / len(pro))
+	wrmsd = math.sqrt(sd / len(p.xyz))
         return wrmsd
 
 
